@@ -1,0 +1,134 @@
+import numpy as np
+import matplotlib.pyplot as plt
+import requests
+
+# Function to fetch COVID-19 data from the API
+def fetch_data(endpoint):
+    base_url = "https://disease.sh/v3/covid-19/"
+    response = requests.get(base_url + endpoint)
+    if response.status_code == 200:
+        return response.json()
+    else:
+        print("Error fetching data")
+        return None
+
+# Function to display information about COVID-19
+def about():
+    print("""
+    ABOUT COVID-19
+    *********************************************************
+    INFO: COVID-19 is caused by SARS-CoV-2, first identified in Wuhan, China, in December 2019.
+    It has since spread worldwide, leading to an ongoing pandemic.
+    """)
+
+# Function to display the most affected countries
+def mostaffected():
+    data = fetch_data("countries?sort=cases")
+    if data:
+        for country in data[:5]:  # Display top 5 affected countries
+            print(f"{country['country']}: {country['cases']} cases")
+
+# Function to plot a graph of the most affected countries
+def gmostaffected():
+    data = fetch_data("countries?sort=cases")
+    if data:
+        countries = [country['country'] for country in data[:5]]
+        cases = [country['cases'] for country in data[:5]]
+        plt.bar(countries, cases, color='b', label='Cases')
+        plt.title("Most affected countries due to COVID-19")
+        plt.xlabel('Countries')
+        plt.ylabel('Number of Cases')
+        plt.legend()
+        plt.show()
+
+# Function to display the least affected countries
+def leastaffected():
+    data = fetch_data("countries?sort=cases")
+    if data:
+        for country in data[-5:]:  # Display least affected countries
+            print(f"{country['country']}: {country['cases']} cases")
+
+# Function to plot a graph of the least affected countries
+def gleastaffected():
+    data = fetch_data("countries?sort=cases")
+    if data:
+        countries = [country['country'] for country in data[-5:]]
+        cases = [country['cases'] for country in data[-5:]]
+        plt.bar(countries, cases, color='g', label='Cases')
+        plt.title("Least affected countries due to COVID-19")
+        plt.xlabel('Countries')
+        plt.ylabel('Number of Cases')
+        plt.legend()
+        plt.show()
+
+# Function to display the number of deaths in the last 24 hours
+def deaths():
+    data = fetch_data("historical/all?lastdays=1")
+    if data:
+        print(f"Deaths: {data['deaths']['latest']} in last 24 hours")
+
+# Function to plot a graph of deaths over the last 30 days
+def gdeaths():
+    data = fetch_data("historical/all?lastdays=30")
+    if data:
+        plt.plot(list(data['deaths'].keys()), list(data['deaths'].values()), marker="*", markeredgecolor='r')
+        plt.title('Deaths Over Last 30 Days')
+        plt.xlabel('Days')
+        plt.ylabel('Number of Deaths')
+        plt.show()
+
+# Function to display the number of COVID-19 tests conducted in different countries
+def testcountries():
+    data = fetch_data("countries?sort=tests")
+    if data:
+        for country in data[:5]:  # Display top 5 countries with highest testing
+            print(f"{country['country']}: {country['tests']} tests conducted")
+
+# Function to plot a pie chart of COVID-19 tests conducted in different countries
+def gtestcountries():
+    data = fetch_data("countries?sort=tests")
+    if data:
+        countries = [country['country'] for country in data[:5]]
+        tests = [country['tests'] for country in data[:5]]
+        plt.pie(tests, labels=countries, autopct='%1.1f%%', shadow=False, startangle=140)
+        plt.title('COVID-19 Tests Conducted in Countries')
+        plt.show()
+
+# Main menu loop
+while True:
+    print("0. About Covid-19")
+    print("1. Worst affected countries")
+    print("2. Least affected countries")
+    print("3. Deaths in last 24 hours")
+    print("4. Show graph for worst affected countries")
+    print("5. Show graph for least affected countries")
+    print("6. Show graph for deaths over last 30 days")
+    print("7. COVID-19 tests conducted in countries")
+    print("8. Show graph for COVID-19 tests conducted")
+    print("9. Exit")
+    
+    opt = int(input("Enter Your Choice: "))
+    
+    if opt == 0:
+        about()
+    elif opt == 1:
+        mostaffected()
+    elif opt == 2:
+        leastaffected()
+    elif opt == 3:
+        deaths()
+    elif opt == 4:
+        gmostaffected()
+    elif opt == 5:
+        gleastaffected()
+    elif opt == 6:
+        gdeaths()
+    elif opt == 7:
+        testcountries()
+    elif opt == 8:
+        gtestcountries()
+    elif opt == 9:
+        print("Thank you! Stay Safe.")
+        break
+    else:
+        print("Invalid Option")
