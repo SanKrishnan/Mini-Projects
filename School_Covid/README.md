@@ -1,4 +1,4 @@
-# COVID-19 Data Analysis with API Integration
+# COVID-Data Analysis-API
 
 ## 📌 Project Overview
 This project was originally developed as part of my **12th-grade coursework** to analyze the impact of the COVID-19 pandemic. Initially, it used **CSV datasets** to display COVID-19 statistics. Now, I have **enhanced** the project by integrating a **real-time API**, which dynamically fetches COVID-19 data instead of relying on static files.
@@ -24,7 +24,7 @@ pip install requests matplotlib
 
 ### 2️⃣ Clone the Repository
 ```sh
-git clone https://github.com/SanKrishnan/covid-analysis-api.git
+git clone https://github.com/SanKrishnan/mini-projects.git
 cd covid-analysis-api
 ```
 
