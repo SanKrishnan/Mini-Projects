@@ -1,134 +1,133 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import requests
+import tkinter as tk
+from tkinter import ttk, messagebox
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
-# Function to fetch COVID-19 data from the API
+# ==================== API FETCH FUNCTION ====================
 def fetch_data(endpoint):
     base_url = "https://disease.sh/v3/covid-19/"
-    response = requests.get(base_url + endpoint)
-    if response.status_code == 200:
+    try:
+        response = requests.get(base_url + endpoint)
+        response.raise_for_status()
         return response.json()
-    else:
-        print("Error fetching data")
+    except requests.RequestException as e:
+        messagebox.showerror("API Error", f"Error fetching data: {e}")
         return None
 
-# Function to display information about COVID-19
-def about():
-    print("""
-    ABOUT COVID-19
-    *********************************************************
+# ==================== GUI FUNCTIONS ====================
+def show_about():
+    messagebox.showinfo("About COVID-19", """
     INFO: COVID-19 is caused by SARS-CoV-2, first identified in Wuhan, China, in December 2019.
     It has since spread worldwide, leading to an ongoing pandemic.
     """)
 
-# Function to display the most affected countries
-def mostaffected():
-    data = fetch_data("countries?sort=cases")
+def show_top_countries_gui(metric="cases", ascending=False, n=5):
+    data = fetch_data(f"countries?sort={metric}")
+    result = ""
     if data:
-        for country in data[:5]:  # Display top 5 affected countries
-            print(f"{country['country']}: {country['cases']} cases")
+        sorted_data = sorted(data, key=lambda x: x.get(metric, 0), reverse=not ascending)
+        for country in sorted_data[:n]:
+            result += f"{country['country']}: {country.get(metric, 0)} {metric}\n"
+    messagebox.showinfo(f"Top Countries by {metric.capitalize()}", result)
 
-# Function to plot a graph of the most affected countries
-def gmostaffected():
-    data = fetch_data("countries?sort=cases")
+def show_graph_gui(metric="cases", ascending=False, n=5, title="", color='b'):
+    data = fetch_data(f"countries?sort={metric}")
     if data:
-        countries = [country['country'] for country in data[:5]]
-        cases = [country['cases'] for country in data[:5]]
-        plt.bar(countries, cases, color='b', label='Cases')
-        plt.title("Most affected countries due to COVID-19")
-        plt.xlabel('Countries')
-        plt.ylabel('Number of Cases')
-        plt.legend()
-        plt.show()
+        sorted_data = sorted(data, key=lambda x: x.get(metric, 0), reverse=not ascending)
+        countries = [c['country'] for c in sorted_data[:n]]
+        values = [c.get(metric, 0) for c in sorted_data[:n]]
 
-# Function to display the least affected countries
-def leastaffected():
-    data = fetch_data("countries?sort=cases")
-    if data:
-        for country in data[-5:]:  # Display least affected countries
-            print(f"{country['country']}: {country['cases']} cases")
+        fig, ax = plt.subplots()
+        ax.bar(countries, values, color=color, label=metric.capitalize())
+        ax.set_title(title)
+        ax.set_xlabel('Countries')
+        ax.set_ylabel(f'Number of {metric.capitalize()}')
+        ax.legend()
+        fig.tight_layout()
 
-# Function to plot a graph of the least affected countries
-def gleastaffected():
-    data = fetch_data("countries?sort=cases")
-    if data:
-        countries = [country['country'] for country in data[-5:]]
-        cases = [country['cases'] for country in data[-5:]]
-        plt.bar(countries, cases, color='g', label='Cases')
-        plt.title("Least affected countries due to COVID-19")
-        plt.xlabel('Countries')
-        plt.ylabel('Number of Cases')
-        plt.legend()
-        plt.show()
+        plot_window = tk.Toplevel(root)
+        plot_window.title(title)
+        canvas = FigureCanvasTkAgg(fig, master=plot_window)
+        canvas.draw()
+        canvas.get_tk_widget().pack()
 
-# Function to display the number of deaths in the last 24 hours
-def deaths():
+def show_deaths_today():
     data = fetch_data("historical/all?lastdays=1")
     if data:
-        print(f"Deaths: {data['deaths']['latest']} in last 24 hours")
+        latest_deaths = list(data['deaths'].values())[-1]
+        messagebox.showinfo("Deaths in Last 24 Hours", f"Deaths: {latest_deaths}")
 
-# Function to plot a graph of deaths over the last 30 days
-def gdeaths():
+def show_deaths_graph():
     data = fetch_data("historical/all?lastdays=30")
     if data:
-        plt.plot(list(data['deaths'].keys()), list(data['deaths'].values()), marker="*", markeredgecolor='r')
-        plt.title('Deaths Over Last 30 Days')
-        plt.xlabel('Days')
-        plt.ylabel('Number of Deaths')
-        plt.show()
+        fig, ax = plt.subplots()
+        ax.plot(list(data['deaths'].keys()), list(data['deaths'].values()), marker="*", color='red')
+        ax.set_title('Deaths Over Last 30 Days')
+        ax.set_xlabel('Days')
+        ax.set_ylabel('Number of Deaths')
+        fig.autofmt_xdate()
+        fig.tight_layout()
 
-# Function to display the number of COVID-19 tests conducted in different countries
-def testcountries():
-    data = fetch_data("countries?sort=tests")
-    if data:
-        for country in data[:5]:  # Display top 5 countries with highest testing
-            print(f"{country['country']}: {country['tests']} tests conducted")
+        plot_window = tk.Toplevel(root)
+        plot_window.title("Deaths Over 30 Days")
+        canvas = FigureCanvasTkAgg(fig, master=plot_window)
+        canvas.draw()
+        canvas.get_tk_widget().pack()
 
-# Function to plot a pie chart of COVID-19 tests conducted in different countries
-def gtestcountries():
+def search_country_gui():
+    def search():
+        name = entry.get()
+        data = fetch_data(f"countries/{name}")
+        if data:
+            info = f"Country: {data['country']}\nCases: {data.get('cases', 'N/A')}\nDeaths: {data.get('deaths', 'N/A')}\nRecovered: {data.get('recovered', 'N/A')}\nActive: {data.get('active', 'N/A')}\nTests: {data.get('tests', 'N/A')}"
+            messagebox.showinfo("Country Stats", info)
+
+    win = tk.Toplevel(root)
+    win.title("Search Country")
+    tk.Label(win, text="Enter Country Name:").pack(pady=5)
+    entry = tk.Entry(win)
+    entry.pack(pady=5)
+    tk.Button(win, text="Search", command=search).pack(pady=5)
+
+def show_test_graph():
     data = fetch_data("countries?sort=tests")
     if data:
         countries = [country['country'] for country in data[:5]]
-        tests = [country['tests'] for country in data[:5]]
-        plt.pie(tests, labels=countries, autopct='%1.1f%%', shadow=False, startangle=140)
-        plt.title('COVID-19 Tests Conducted in Countries')
-        plt.show()
+        tests = [country.get('tests', 0) for country in data[:5]]
 
-# Main menu loop
-while True:
-    print("0. About Covid-19")
-    print("1. Worst affected countries")
-    print("2. Least affected countries")
-    print("3. Deaths in last 24 hours")
-    print("4. Show graph for worst affected countries")
-    print("5. Show graph for least affected countries")
-    print("6. Show graph for deaths over last 30 days")
-    print("7. COVID-19 tests conducted in countries")
-    print("8. Show graph for COVID-19 tests conducted")
-    print("9. Exit")
-    
-    opt = int(input("Enter Your Choice: "))
-    
-    if opt == 0:
-        about()
-    elif opt == 1:
-        mostaffected()
-    elif opt == 2:
-        leastaffected()
-    elif opt == 3:
-        deaths()
-    elif opt == 4:
-        gmostaffected()
-    elif opt == 5:
-        gleastaffected()
-    elif opt == 6:
-        gdeaths()
-    elif opt == 7:
-        testcountries()
-    elif opt == 8:
-        gtestcountries()
-    elif opt == 9:
-        print("Thank you! Stay Safe.")
-        break
-    else:
-        print("Invalid Option")
+        fig, ax = plt.subplots()
+        ax.pie(tests, labels=countries, autopct='%1.1f%%', startangle=140)
+        ax.set_title('COVID-19 Tests Conducted in Countries')
+
+        plot_window = tk.Toplevel(root)
+        plot_window.title("COVID-19 Tests")
+        canvas = FigureCanvasTkAgg(fig, master=plot_window)
+        canvas.draw()
+        canvas.get_tk_widget().pack()
+
+# ==================== GUI WINDOW ====================
+root = tk.Tk()
+root.title("COVID-19 Dashboard")
+root.geometry("400x500")
+
+options = [
+    ("About COVID-19", show_about),
+    ("Top 5 Worst Affected", lambda: show_top_countries_gui()),
+    ("Top 5 Least Affected", lambda: show_top_countries_gui(ascending=True)),
+    ("Deaths in Last 24 Hours", show_deaths_today),
+    ("Graph - Worst Affected", lambda: show_graph_gui(title="Most Affected Countries", color='blue')),
+    ("Graph - Least Affected", lambda: show_graph_gui(ascending=True, title="Least Affected Countries", color='green')),
+    ("Graph - Deaths Over 30 Days", show_deaths_graph),
+    ("Top 5 Testing Countries", lambda: show_top_countries_gui(metric="tests")),
+    ("Graph - Testing Countries", show_test_graph),
+    ("Search Country Stats", search_country_gui),
+    ("Exit", root.quit)
+]
+
+for (text, command) in options:
+    btn = tk.Button(root, text=text, command=command, width=40, pady=5)
+    btn.pack(pady=3)
+
+root.mainloop()
