@@ -1,70 +1,89 @@
-# COVID-Data Analysis-API
+🦠 COVID-Data Analysis - Real-Time API with GUI
+📌 Project Overview
+Originally created as a 12th-grade academic project, this COVID-19 dashboard began with static CSV datasets. It has since evolved into a powerful tool that integrates a real-time API and now features a Tkinter-based GUI, enabling users to interactively explore COVID-19 data across the globe.
 
-## 📌 Project Overview
-This project was originally developed as part of my **12th-grade coursework** to analyze the impact of the COVID-19 pandemic. Initially, it used **CSV datasets** to display COVID-19 statistics. Now, I have **enhanced** the project by integrating a **real-time API**, which dynamically fetches COVID-19 data instead of relying on static files.
+🔧 Technologies Used
+Python – Core logic and GUI
 
-## 🔧 Technologies Used
-- **Python** - Data handling and processing
-- **Requests** - API integration for real-time data
-- **Matplotlib** - Data visualization using graphs and charts
+Requests – API integration for real-time data
 
-## ✨ Features
-✅ Fetches **real-time COVID-19 data** via an API
-✅ Displays **most & least affected states/countries**
-✅ Visualizes **COVID-19 cases, recoveries, deaths, and testing trends**
-✅ Interactive **menu-based navigation**
-✅ Implements **bar graphs and pie charts** for easy data interpretation
+Matplotlib – Visual representation through graphs and charts
 
-## 🛠 Installation & Setup
-### 1️⃣ Install Required Libraries
-Ensure you have Python installed and run the following command to install dependencies:
-```sh
+Tkinter – Graphical User Interface for enhanced usability
+
+✨ Features
+✅ Fetches real-time COVID-19 data from a public API
+✅ Displays most & least affected countries dynamically
+✅ Visualizes cases, deaths, and testing trends using bar and pie charts
+✅ Fully functional Tkinter-based GUI – no need for terminal interaction
+✅ Enables country-specific data search
+✅ User-friendly interface with pop-up graphs and messages
+
+🛠 Installation & Setup
+1️⃣ Install Required Libraries
+Ensure Python is installed, then run:
+
+sh
+Copy
+Edit
 pip install requests matplotlib
-```
-
-### 2️⃣ Clone the Repository
-```sh
+2️⃣ Clone the Repository
+sh
+Copy
+Edit
 git clone https://github.com/SanKrishnan/mini-projects.git
 cd covid-analysis-api
-```
-
-### 3️⃣ Run the Program
-```sh
+3️⃣ Run the Program
+sh
+Copy
+Edit
 python covid_analysis.py
-```
+🖥️ How It Works
+Launches a Tkinter GUI with easy-to-navigate buttons.
 
-## 🖥️ How It Works
-- The program provides a **menu-based** interface for easy navigation.
-- The user can select an option to view **COVID-19 statistics** for different regions.
-- The program fetches **live data from an API**, eliminating the need for manual CSV updates.
-- **Graphs and charts** provide a visual representation of the COVID-19 trends.
+Click on menu options to view live stats, graphs, or search for a country.
 
-## 📊 Menu Options
-```
-0. About COVID-19
-1. Worst affected states/countries
-2. Least affected states/countries
-3. Deaths by age group
-4. COVID-19 updates for Maharashtra (Example)
-5. COVID-19 testing stats globally
-6-10. Graphical representation for the above
-11. Exit
-```
+Real-time data is retrieved from an open-source COVID-19 API.
 
-## 🌍 API Integration
-This project fetches real-time COVID-19 data using an **open-source COVID-19 API**. The API provides up-to-date statistics for different countries, states, and age groups.
+Graphs are generated dynamically inside the GUI using Matplotlib.
 
-## 📝 Future Improvements
-- Add more **detailed data insights** such as vaccination rates
-- Implement a **GUI version** using Tkinter or Flask
-- Allow users to **search for specific countries/states**
+📊 GUI Menu Options
+About COVID-19
 
-## 🤝 Contributing
-Feel free to contribute by submitting **pull requests** or **feature suggestions**!
+Top 5 Worst Affected Countries
 
-## 📜 License
-This project is open-source under the **MIT License**.
+Top 5 Least Affected Countries
 
----
-🚀 **Stay Safe & Stay Informed!**
+Deaths in Last 24 Hours
 
+Graph - Most/Least Affected
+
+Graph - Deaths over Last 30 Days
+
+Testing Stats and Pie Graph
+
+Country Stats Search
+
+Exit
+
+🌍 API Integration
+Utilizes the disease.sh open-source API to fetch:
+
+Country-wise cases, deaths, tests
+
+Historical trends for the last 30 days
+
+🚀 Future Enhancements
+Include vaccination data and trends
+
+Add dark mode for GUI
+
+Introduce voice commands for accessibility
+
+Option to export graphs as PNG/PDF
+
+🤝 Contributing
+Pull requests and ideas for new features are welcome!
+
+📜 License
+Licensed under the MIT License.
