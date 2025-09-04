@@ -4,7 +4,7 @@ import requests
 from PIL import Image, ImageTk
 import io
 
-app = Flask(WeatherNow)
+app = Flask(__name__)
 
 def get_weather_data(city):
     my_api = "35f4e77c137e0108200f1ab75484e567"
