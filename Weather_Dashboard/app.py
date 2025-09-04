@@ -1,32 +1,39 @@
-from flask import Flask, render_template, request
+from flask import Flask, request, jsonify, send_from_directory
 import requests
 import os
-
-app = Flask(__name__)
+try:
+    app = Flask(__name__, static_folder='Mini-Projects/Weather_Dashboard')
+except Exception:
+    print("File not found!!!")
 
 def get_weather_data(city):
     my_api = os.environ.get("API_KEY", "35f4e77c137e0108200f1ab75484e567")
     url = f"https://api.openweathermap.org/data/2.5/weather?q={city}&appid={my_api}&units=metric"
     try:
         response = requests.get(url, timeout=10)
-        data = response.json()
         if response.status_code == 200:
-            return data
-        else:
-            return None
+            return response.json()
+        return None
     except Exception:
         return None
 
-@app.route('/', methods=['GET', 'POST'])
-def index():
-    weather_data = None
-    error = None
-    if request.method == 'POST':
-        city = request.form['city']
-        weather_data = get_weather_data(city)
-        if not weather_data:
-            error = "Could not retrieve weather data. Please check the city name."
-    return render_template('index.html', weather=weather_data, error=error)
+@app.route('/')
+def serve_index():
+    return send_from_directory(app.static_folder, 'index.html')
+
+@app.route('/get_weather', methods=['POST'])
+def get_weather():
+    city = request.form.get('city')
+    weather_data = get_weather_data(city)
+    if weather_data:
+        return jsonify({
+            "name": weather_data["name"],
+            "description": weather_data["weather"][0]["description"].capitalize(),
+            "temperature": weather_data["main"]["temp"],
+            "icon": weather_data["weather"][0]["icon"]
+        })
+    else:
+        return jsonify({"error": "Could not retrieve weather data. Please check the city name."}), 404
 
 if __name__ == '__main__':
     app.run(debug=True)
